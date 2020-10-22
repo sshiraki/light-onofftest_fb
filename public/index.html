@@ -1,0 +1,105 @@
+<script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-firestore.js"></script>
+
+<script>
+// Initialize Firebase
+var config = {
+  apiKey: "AIzaSyASBoLoLAnxxs1GavodIEpVYTyowSqPPK8",
+  authDomain: "test-913f7.firebaseapp.com",
+  databaseURL: "https://test-913f7.firebaseio.com",
+  projectId: "test-913f7",
+  storageBucket: "test-913f7.appspot.com",
+  messagingSenderId: "70208775336",
+  appId: "1:70208775336:web:1aa811d0c6fc6338"
+};
+
+firebase.initializeApp(config);
+
+function loginOrLogout() {
+  if (firebase.auth().currentUser) {
+    // Logout
+    firebase.auth().signOut().then(_ => console.log('Logout: OK '),
+                                   _ => console.log('Logout: Error'));
+  } else {
+    // Login
+    var provider = new firebase.auth.GoogleAuthProvider();
+    provider.addScope('https://www.googleapis.com/auth/plus.login');
+    firebase.auth().signInWithRedirect(provider);
+  }
+}
+
+function sendEnabled(value) {
+  firebase.firestore().collection('test').doc('light')
+      .set({value: value, timestamp: firebase.firestore.FieldValue.serverTimestamp()})
+      .then(_ => console.log('sendEnabled: OK'),
+            _ => console.log('sendEnabled: Error'));
+}
+
+
+function sendTimer() {
+  firebase.firestore().collection('test').doc('timer')
+      .set({
+            on: {
+              enabled: document.getElementById('onCheck').checked,
+              time: document.getElementById('onTime').value
+            },
+            off: {
+              enabled: document.getElementById('offCheck').checked,
+              time: document.getElementById('offTime').value
+            },
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+          })
+      .then(_ => console.log('sendTimer: OK'),
+            _ => console.log('sendTimer: Error'));
+}
+
+function initialize() {
+  firebase.auth().onAuthStateChanged(user => {
+    document.getElementById('loginOrLogout').value = user ? 'Logout' : 'Login';
+  });
+
+  const timerPath = '/test/light';
+  console.log(timerPath);
+  var timerRef1 = firebase.firestore().collection('test');
+  console.log(timerRef1);
+  var timerRef2 = firebase.firestore().collection('test').doc('light');
+  console.log(timerRef2);
+  
+  //firebase.firestore().settings({timestampsInSnapshots: true});
+  firebase.firestore().collection('test').doc('timer').onSnapshot((snapshot) => {
+      print('/test/timer : ' + JSON.stringify(snapshot.data()));
+      var timer = snapshot.data();
+      if (!timer)
+        return;
+      if (timer.on) {
+        if (timer.on.enabled)
+          document.getElementById('onCheck').checked = timer.on.enabled;
+        if (timer.on.time)
+          document.getElementById('onTime').value = timer.on.time;
+      }
+      if (timer.off) {
+        if (timer.off.enabled)
+          document.getElementById('offCheck').checked = timer.off.enabled;
+        if (timer.off.time)
+          document.getElementById('offTime').value = timer.off.time;
+      }
+    });
+}
+window.addEventListener('load', initialize);
+</script>
+
+<input type="button" id='loginOrLogout' onclick="loginOrLogout()" value="">
+<div>
+<input type="button" onclick="sendEnabled(true)" value="On">
+<input type="button" onclick="sendEnabled(false)" value="Off">
+<input type="button" onclick="sendTimer()" value="Set Timer">
+</div>
+<div>
+<label><input type="checkbox" id="onCheck">On: </label>
+<input type="time" id="onTime">
+</div>
+<div>
+<label><input type="checkbox" id="offCheck">Off: </label>
+<input type="time" id="offTime">
+</div>
