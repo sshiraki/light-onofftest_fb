@@ -1,4 +1,4 @@
-# light-onofftest
+# light-onofftest (Server)
 
 This application is test of light on - off client app for node.js　of raspberry pi.
 
