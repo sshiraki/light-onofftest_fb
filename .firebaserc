@@ -1,0 +1,9 @@
+const firebaseConfig = {
+  apiKey: "AIzaSyASBoLoLAnxxs1GavodIEpVYTyowSqPPK8",
+  authDomain: "test-913f7.firebaseapp.com",
+  databaseURL: "https://test-913f7.firebaseio.com",
+  projectId: "test-913f7",
+  storageBucket: "test-913f7.appspot.com",
+  messagingSenderId: "70208775336",
+  appId: "1:70208775336:web:1aa811d0c6fc6338"
+};
